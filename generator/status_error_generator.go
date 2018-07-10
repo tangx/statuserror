@@ -113,9 +113,9 @@ func (s *StatusError) WriteMethodStatus(file *codegen.File) {
 	file.WriteBlock(
 		codegen.Func().
 			MethodOf(codegen.Var(codegen.Type(s.Name()), "v")).
-			Named("Status").
+			Named("StatusCode").
 			Return(codegen.Var(codegen.Int)).Do(
-			file.Expr(`return ?(int(v))`, codegen.Id(file.Use("github.com/go-courier/status_error", "GetStatus"))),
+			file.Expr(`return ?(int(v))`, codegen.Id(file.Use("github.com/go-courier/status_error", "StatusCodeFromCode"))),
 		),
 	)
 }

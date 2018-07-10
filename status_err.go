@@ -97,7 +97,7 @@ func (statusErr *StatusErr) Is(err error) bool {
 	return FromErr(err).Code == statusErr.Code
 }
 
-func GetStatus(code int) int {
+func StatusCodeFromCode(code int) int {
 	strCode := fmt.Sprintf("%d", code)
 	if len(strCode) < 3 {
 		return 0
@@ -106,8 +106,8 @@ func GetStatus(code int) int {
 	return statusCode
 }
 
-func (statusErr *StatusErr) Status() int {
-	return GetStatus(statusErr.Code)
+func (statusErr *StatusErr) StatusCode() int {
+	return StatusCodeFromCode(statusErr.Code)
 }
 
 func (statusErr *StatusErr) Error() string {

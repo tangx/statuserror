@@ -5,7 +5,7 @@ type StatusError interface {
 	Code() int
 	Msg() string
 	CanBeTalkError() bool
-	Status() int
+	StatusCode() int
 	StatusErr() *StatusErr
 	Error() string
 }

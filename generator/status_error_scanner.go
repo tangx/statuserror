@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -11,7 +12,6 @@ import (
 	"golang.org/x/tools/go/loader"
 
 	"github.com/go-courier/status_error"
-	"sort"
 )
 
 func NewStatusErrorScanner(program *loader.Program) *StatusErrorScanner {

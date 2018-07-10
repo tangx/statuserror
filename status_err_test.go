@@ -34,8 +34,8 @@ func TestStatusErr(t *testing.T) {
 	assert.Equal(t, "@StatusErr[Unauthorized][401999001][Unauthorized]!", examples.Unauthorized.StatusErr().Summary())
 	assert.Equal(t, "@StatusErr[InternalServerError][500999001][InternalServerError]", examples.InternalServerError.StatusErr().Summary())
 
-	assert.Equal(t, 401, examples.Unauthorized.Status())
-	assert.Equal(t, 401, examples.Unauthorized.StatusErr().Status())
+	assert.Equal(t, 401, examples.Unauthorized.StatusCode())
+	assert.Equal(t, 401, examples.Unauthorized.StatusErr().StatusCode())
 
 	assert.True(t, examples.Unauthorized.StatusErr().Is(examples.Unauthorized))
 	assert.True(t, examples.Unauthorized.StatusErr().Is(examples.Unauthorized.StatusErr()))

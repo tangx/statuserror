@@ -21,8 +21,8 @@ func (v StatusError) Error() string {
 	return v.StatusErr().Error()
 }
 
-func (v StatusError) Status() int {
-	return github_com_go_courier_status_error.GetStatus(int(v))
+func (v StatusError) StatusCode() int {
+	return github_com_go_courier_status_error.StatusCodeFromCode(int(v))
 }
 
 func (v StatusError) Code() int {
