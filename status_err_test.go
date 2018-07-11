@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/go-courier/status_error"
-	"github.com/go-courier/status_error/examples"
+	"github.com/go-courier/status_error/__examples__"
 )
 
 func ExampleStatusErr() {

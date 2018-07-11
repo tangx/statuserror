@@ -1,4 +1,4 @@
 test:
-	vgo test -race `go list ./... | grep -v examples`
+	vgo test -race ./...
 cover:
-	vgo test -race -coverprofile=coverage.txt -covermode=atomic `go list ./... | grep -v examples`
+	vgo test -race -coverprofile=coverage.txt -covermode=atomic ./...
