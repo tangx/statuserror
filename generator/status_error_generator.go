@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/tools/go/loader"
 
-	"github.com/go-courier/status_error"
+	"github.com/go-courier/statuserror"
 )
 
 func NewStatusErrorGenerator(program *loader.Program, rootPkgInfo *loader.PackageInfo) *StatusErrorGenerator {
@@ -57,7 +57,7 @@ func (g *StatusErrorGenerator) Output(cwd string) {
 
 type StatusError struct {
 	TypeName *types.TypeName
-	Errors   []*status_error.StatusErr
+	Errors   []*statuserror.StatusErr
 }
 
 func (s *StatusError) Name() string {
@@ -77,7 +77,7 @@ func (s *StatusError) WriteToFile(file *codegen.File) {
 }
 
 func (s *StatusError) WriteMethodImplements(file *codegen.File) {
-	tpe := codegen.Type(file.Use("github.com/go-courier/status_error", "StatusError"))
+	tpe := codegen.Type(file.Use("github.com/go-courier/statuserror", "StatusError"))
 
 	file.WriteBlock(
 		file.Expr("var _ ? = (*?)(nil)", codegen.Interface(tpe), codegen.Type(s.Name())),
@@ -85,7 +85,7 @@ func (s *StatusError) WriteMethodImplements(file *codegen.File) {
 }
 
 func (s *StatusError) WriteMethodStatusErrAndError(file *codegen.File) {
-	tpe := codegen.Type(file.Use("github.com/go-courier/status_error", "StatusErr"))
+	tpe := codegen.Type(file.Use("github.com/go-courier/statuserror", "StatusErr"))
 
 	file.WriteBlock(
 		codegen.Func().
@@ -115,7 +115,7 @@ func (s *StatusError) WriteMethodStatus(file *codegen.File) {
 			MethodOf(codegen.Var(codegen.Type(s.Name()), "v")).
 			Named("StatusCode").
 			Return(codegen.Var(codegen.Int)).Do(
-			file.Expr(`return ?(int(v))`, codegen.Id(file.Use("github.com/go-courier/status_error", "StatusCodeFromCode"))),
+			file.Expr(`return ?(int(v))`, codegen.Id(file.Use("github.com/go-courier/statuserror", "StatusCodeFromCode"))),
 		),
 	)
 }
@@ -130,7 +130,7 @@ func (s *StatusError) WriteMethodCode(file *codegen.File) {
 	return withServiceCode.ServiceCode() + int(v)
 }
 return int(v)
-`, codegen.Id(file.Use("github.com/go-courier/status_error", "StatusErrorWithServiceCode"))),
+`, codegen.Id(file.Use("github.com/go-courier/statuserror", "StatusErrorWithServiceCode"))),
 		),
 	)
 }

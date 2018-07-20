@@ -1,4 +1,4 @@
-package status_error_test
+package statuserror_test
 
 import (
 	"fmt"
@@ -6,14 +6,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/go-courier/status_error"
-	"github.com/go-courier/status_error/__examples__"
+	"github.com/go-courier/statuserror"
+	"github.com/go-courier/statuserror/__examples__"
 )
 
 func ExampleStatusErr() {
 	fmt.Println(examples.Unauthorized)
-	fmt.Println(status_error.FromErr(nil))
-	fmt.Println(status_error.FromErr(fmt.Errorf("unknown")))
+	fmt.Println(statuserror.FromErr(nil))
+	fmt.Println(statuserror.FromErr(fmt.Errorf("unknown")))
 	// Output:
 	//[]@StatusErr[Unauthorized][401999001][Unauthorized]!
 	//<nil>
@@ -22,14 +22,14 @@ func ExampleStatusErr() {
 }
 
 func TestStatusErr(t *testing.T) {
-	summary := status_error.NewUnknownErr().Summary()
+	summary := statuserror.NewUnknownErr().Summary()
 
 	assert.Equal(t, "@StatusErr[UnknownError][500000000][unknown error]", summary)
 
-	statusErr, err := status_error.ParseStatusErrSummary(summary)
+	statusErr, err := statuserror.ParseStatusErrSummary(summary)
 	assert.NoError(t, err)
 
-	assert.Equal(t, status_error.NewUnknownErr(), statusErr)
+	assert.Equal(t, statuserror.NewUnknownErr(), statusErr)
 
 	assert.Equal(t, "@StatusErr[Unauthorized][401999001][Unauthorized]!", examples.Unauthorized.StatusErr().Summary())
 	assert.Equal(t, "@StatusErr[InternalServerError][500999001][InternalServerError]", examples.InternalServerError.StatusErr().Summary())
@@ -49,7 +49,7 @@ func TestStatusErrBuilders(t *testing.T) {
 	t.Log(examples.Unauthorized.StatusErr().AppendSource("service-abc"))
 	t.Log(examples.Unauthorized.StatusErr().AppendErrorField("header", "Authorization", "missing"))
 	t.Log(examples.Unauthorized.StatusErr().AppendErrorFields(
-		status_error.NewErrorField("query", "key", "missing"),
-		status_error.NewErrorField("header", "Authorization", "missing"),
+		statuserror.NewErrorField("query", "key", "missing"),
+		statuserror.NewErrorField("header", "Authorization", "missing"),
 	))
 }

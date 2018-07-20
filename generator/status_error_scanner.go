@@ -11,7 +11,7 @@ import (
 	"github.com/go-courier/loaderx"
 	"golang.org/x/tools/go/loader"
 
-	"github.com/go-courier/status_error"
+	"github.com/go-courier/statuserror"
 )
 
 func NewStatusErrorScanner(program *loader.Program) *StatusErrorScanner {
@@ -22,17 +22,17 @@ func NewStatusErrorScanner(program *loader.Program) *StatusErrorScanner {
 
 type StatusErrorScanner struct {
 	program      *loader.Program
-	StatusErrors map[*types.TypeName][]*status_error.StatusErr
+	StatusErrors map[*types.TypeName][]*statuserror.StatusErr
 }
 
-func sortedStatusErrList(list []*status_error.StatusErr) []*status_error.StatusErr {
+func sortedStatusErrList(list []*statuserror.StatusErr) []*statuserror.StatusErr {
 	sort.Slice(list, func(i, j int) bool {
 		return list[i].Code < list[j].Code
 	})
 	return list
 }
 
-func (scanner *StatusErrorScanner) StatusError(typeName *types.TypeName) []*status_error.StatusErr {
+func (scanner *StatusErrorScanner) StatusError(typeName *types.TypeName) []*statuserror.StatusErr {
 	if typeName == nil {
 		return nil
 	}
@@ -102,10 +102,10 @@ func (scanner *StatusErrorScanner) addStatusError(
 	key string, code int, msg string, canBeTalkError bool,
 ) {
 	if scanner.StatusErrors == nil {
-		scanner.StatusErrors = map[*types.TypeName][]*status_error.StatusErr{}
+		scanner.StatusErrors = map[*types.TypeName][]*statuserror.StatusErr{}
 	}
 
-	statusErr := status_error.NewStatusErr(key, code, msg)
+	statusErr := statuserror.NewStatusErr(key, code, msg)
 	if canBeTalkError {
 		statusErr = statusErr.EnableErrTalk()
 	}

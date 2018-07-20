@@ -1,4 +1,4 @@
-package status_error
+package statuserror
 
 import (
 	"bytes"

@@ -1,4 +1,4 @@
-package status_error
+package statuserror
 
 type StatusError interface {
 	Key() string

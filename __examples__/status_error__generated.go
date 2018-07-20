@@ -1,15 +1,15 @@
 package examples
 
 import (
-	github_com_go_courier_status_error "github.com/go-courier/status_error"
+	github_com_go_courier_statuserror "github.com/go-courier/statuserror"
 )
 
 var _ interface {
-	github_com_go_courier_status_error.StatusError
+	github_com_go_courier_statuserror.StatusError
 } = (*StatusError)(nil)
 
-func (v StatusError) StatusErr() *github_com_go_courier_status_error.StatusErr {
-	return &github_com_go_courier_status_error.StatusErr{
+func (v StatusError) StatusErr() *github_com_go_courier_statuserror.StatusErr {
+	return &github_com_go_courier_statuserror.StatusErr{
 		Key:            v.Key(),
 		Code:           v.Code(),
 		Msg:            v.Msg(),
@@ -22,11 +22,11 @@ func (v StatusError) Error() string {
 }
 
 func (v StatusError) StatusCode() int {
-	return github_com_go_courier_status_error.StatusCodeFromCode(int(v))
+	return github_com_go_courier_statuserror.StatusCodeFromCode(int(v))
 }
 
 func (v StatusError) Code() int {
-	if withServiceCode, ok := (interface{})(v).(github_com_go_courier_status_error.StatusErrorWithServiceCode); ok {
+	if withServiceCode, ok := (interface{})(v).(github_com_go_courier_statuserror.StatusErrorWithServiceCode); ok {
 		return withServiceCode.ServiceCode() + int(v)
 	}
 	return int(v)
