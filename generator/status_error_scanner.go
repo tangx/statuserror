@@ -12,6 +12,7 @@ import (
 	"golang.org/x/tools/go/loader"
 
 	"github.com/go-courier/statuserror"
+	"github.com/go-courier/reflectx/typesutil"
 )
 
 func NewStatusErrorScanner(program *loader.Program) *StatusErrorScanner {
@@ -54,9 +55,9 @@ func (scanner *StatusErrorScanner) StatusError(typeName *types.TypeName) []*stat
 
 	serviceCode := 0
 
-	method := loaderx.MethodOf(typeName.Type().(*types.Named), "ServiceCode")
-	if method != nil {
-		results, n := prog.FuncResultsOf(method)
+	method, ok := typesutil.FromTType(typeName.Type()).MethodByName("ServiceCode")
+	if ok {
+		results, n := loaderx.NewProgram(scanner.program).FuncResultsOf(method.(*typesutil.TMethod).Func)
 		if n == 1 {
 			ret := results[0][0]
 			if ret.IsValue() {
