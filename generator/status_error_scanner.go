@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	"github.com/go-courier/loaderx"
+	"github.com/go-courier/reflectx/typesutil"
 	"golang.org/x/tools/go/loader"
 
 	"github.com/go-courier/statuserror"
-	"github.com/go-courier/reflectx/typesutil"
 )
 
 func NewStatusErrorScanner(program *loader.Program) *StatusErrorScanner {

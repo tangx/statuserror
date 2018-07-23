@@ -3,12 +3,12 @@ package generator
 import (
 	"go/build"
 	"go/types"
+	"log"
 	"path"
 	"path/filepath"
 
 	"github.com/go-courier/codegen"
 	"github.com/go-courier/loaderx"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/tools/go/loader"
 
 	"github.com/go-courier/statuserror"
@@ -50,7 +50,7 @@ func (g *StatusErrorGenerator) Output(cwd string) {
 		statusErr.WriteToFile(file)
 
 		if _, err := file.WriteFile(); err != nil {
-			logrus.Printf("%s generated", file)
+			log.Printf("%s generated", file)
 		}
 	}
 }
