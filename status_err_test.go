@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/go-courier/statuserror"
 	"github.com/go-courier/statuserror/__examples__"
@@ -24,21 +24,21 @@ func ExampleStatusErr() {
 func TestStatusErr(t *testing.T) {
 	summary := statuserror.NewUnknownErr().Summary()
 
-	assert.Equal(t, "@StatusErr[UnknownError][500000000][unknown error]", summary)
+	require.Equal(t, "@StatusErr[UnknownError][500000000][unknown error]", summary)
 
 	statusErr, err := statuserror.ParseStatusErrSummary(summary)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Equal(t, statuserror.NewUnknownErr(), statusErr)
+	require.Equal(t, statuserror.NewUnknownErr(), statusErr)
 
-	assert.Equal(t, "@StatusErr[Unauthorized][401999001][Unauthorized]!", examples.Unauthorized.StatusErr().Summary())
-	assert.Equal(t, "@StatusErr[InternalServerError][500999001][InternalServerError]", examples.InternalServerError.StatusErr().Summary())
+	require.Equal(t, "@StatusErr[Unauthorized][401999001][Unauthorized]!", examples.Unauthorized.StatusErr().Summary())
+	require.Equal(t, "@StatusErr[InternalServerError][500999001][InternalServerError]", examples.InternalServerError.StatusErr().Summary())
 
-	assert.Equal(t, 401, examples.Unauthorized.StatusCode())
-	assert.Equal(t, 401, examples.Unauthorized.StatusErr().StatusCode())
+	require.Equal(t, 401, examples.Unauthorized.StatusCode())
+	require.Equal(t, 401, examples.Unauthorized.StatusErr().StatusCode())
 
-	assert.True(t, examples.Unauthorized.StatusErr().Is(examples.Unauthorized))
-	assert.True(t, examples.Unauthorized.StatusErr().Is(examples.Unauthorized.StatusErr()))
+	require.True(t, examples.Unauthorized.StatusErr().Is(examples.Unauthorized))
+	require.True(t, examples.Unauthorized.StatusErr().Is(examples.Unauthorized.StatusErr()))
 }
 
 func TestStatusErrBuilders(t *testing.T) {

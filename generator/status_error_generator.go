@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"go/build"
 	"go/types"
 	"log"
 	"path"
@@ -12,6 +11,8 @@ import (
 	"golang.org/x/tools/go/loader"
 
 	"github.com/go-courier/statuserror"
+	"golang.org/x/tools/go/packages"
+	"fmt"
 )
 
 func NewStatusErrorGenerator(program *loader.Program, rootPkgInfo *loader.PackageInfo) *StatusErrorGenerator {
@@ -40,10 +41,22 @@ func (g *StatusErrorGenerator) Scan(names ...string) {
 	}
 }
 
+func getPkgDir(importPath string) string {
+	pkgs, err := packages.Load(&packages.Config{
+		Mode: packages.LoadFiles,
+	}, importPath)
+	if err != nil {
+		panic(err)
+	}
+	if len(pkgs) == 0 {
+		panic(fmt.Errorf("package `%s` not found", importPath))
+	}
+	return filepath.Dir(pkgs[0].GoFiles[0])
+}
+
 func (g *StatusErrorGenerator) Output(cwd string) {
 	for _, statusErr := range g.statusErrors {
-		p, _ := build.Import(statusErr.TypeName.Pkg().Path(), "", build.FindOnly)
-		dir, _ := filepath.Rel(cwd, p.Dir)
+		dir, _ := filepath.Rel(cwd, getPkgDir(statusErr.TypeName.Pkg().Path()))
 		filename := codegen.GeneratedFileSuffix(path.Join(dir, codegen.LowerSnakeCase(statusErr.Name())+".go"))
 
 		file := codegen.NewFile(statusErr.TypeName.Pkg().Name(), filename)
