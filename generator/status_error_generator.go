@@ -1,39 +1,36 @@
 package generator
 
 import (
+	"fmt"
 	"go/types"
 	"log"
 	"path"
 	"path/filepath"
 
 	"github.com/go-courier/codegen"
-	"github.com/go-courier/loaderx"
-	"golang.org/x/tools/go/loader"
+	"github.com/go-courier/packagesx"
+	"golang.org/x/tools/go/packages"
 
 	"github.com/go-courier/statuserror"
-	"golang.org/x/tools/go/packages"
-	"fmt"
 )
 
-func NewStatusErrorGenerator(program *loader.Program, rootPkgInfo *loader.PackageInfo) *StatusErrorGenerator {
+func NewStatusErrorGenerator(pkg *packagesx.Package) *StatusErrorGenerator {
 	return &StatusErrorGenerator{
-		pkgInfo:      rootPkgInfo,
-		scanner:      NewStatusErrorScanner(program),
+		pkg:          pkg,
+		scanner:      NewStatusErrorScanner(pkg),
 		statusErrors: map[string]*StatusError{},
 	}
 }
 
 type StatusErrorGenerator struct {
-	pkgInfo      *loader.PackageInfo
+	pkg          *packagesx.Package
 	scanner      *StatusErrorScanner
 	statusErrors map[string]*StatusError
 }
 
 func (g *StatusErrorGenerator) Scan(names ...string) {
-	pkgInfo := loaderx.NewPackageInfo(g.pkgInfo)
-
 	for _, name := range names {
-		typeName := pkgInfo.TypeName(name)
+		typeName := g.pkg.TypeName(name)
 		g.statusErrors[name] = &StatusError{
 			TypeName: typeName,
 			Errors:   g.scanner.StatusError(typeName),

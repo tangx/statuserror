@@ -8,21 +8,20 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-courier/loaderx"
+	"github.com/go-courier/packagesx"
 	"github.com/go-courier/reflectx/typesutil"
-	"golang.org/x/tools/go/loader"
 
 	"github.com/go-courier/statuserror"
 )
 
-func NewStatusErrorScanner(program *loader.Program) *StatusErrorScanner {
+func NewStatusErrorScanner(pkg *packagesx.Package) *StatusErrorScanner {
 	return &StatusErrorScanner{
-		program: program,
+		pkg: pkg,
 	}
 }
 
 type StatusErrorScanner struct {
-	program      *loader.Program
+	pkg          *packagesx.Package
 	StatusErrors map[*types.TypeName][]*statuserror.StatusErr
 }
 
@@ -46,9 +45,7 @@ func (scanner *StatusErrorScanner) StatusError(typeName *types.TypeName) []*stat
 		panic(fmt.Errorf("status error type underlying must be an int or uint, but got %s", typeName.String()))
 	}
 
-	prog := loaderx.NewProgram(scanner.program)
-
-	pkgInfo := prog.Package(typeName.Pkg().Path())
+	pkgInfo := scanner.pkg.Pkg(typeName.Pkg().Path())
 	if pkgInfo == nil {
 		return nil
 	}
@@ -57,7 +54,7 @@ func (scanner *StatusErrorScanner) StatusError(typeName *types.TypeName) []*stat
 
 	method, ok := typesutil.FromTType(typeName.Type()).MethodByName("ServiceCode")
 	if ok {
-		results, n := loaderx.NewProgram(scanner.program).FuncResultsOf(method.(*typesutil.TMethod).Func)
+		results, n := scanner.pkg.FuncResultsOf(method.(*typesutil.TMethod).Func)
 		if n == 1 {
 			ret := results[0][0]
 			if ret.IsValue() {
@@ -68,7 +65,7 @@ func (scanner *StatusErrorScanner) StatusError(typeName *types.TypeName) []*stat
 		}
 	}
 
-	for ident, def := range pkgInfo.Defs {
+	for ident, def := range pkgInfo.TypesInfo.Defs {
 		typeConst, ok := def.(*types.Const)
 		if !ok {
 			continue

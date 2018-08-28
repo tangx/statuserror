@@ -5,14 +5,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/go-courier/loaderx"
+	"github.com/go-courier/packagesx"
 )
 
 func TestGenerator(t *testing.T) {
 	cwd, _ := os.Getwd()
-	p, pkgInfo, _ := loaderx.LoadWithTests(filepath.Join(cwd, "../__examples__"))
+	pkg, _ := packagesx.Load(filepath.Join(cwd, "../__examples__"))
 
-	g := NewStatusErrorGenerator(p, pkgInfo)
+	g := NewStatusErrorGenerator(pkg)
 
 	g.Scan("StatusError")
 	g.Output(cwd)
