@@ -1,6 +1,7 @@
 package statuserror_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -37,8 +38,8 @@ func TestStatusErr(t *testing.T) {
 	require.Equal(t, 401, examples.Unauthorized.StatusCode())
 	require.Equal(t, 401, examples.Unauthorized.StatusErr().StatusCode())
 
-	require.True(t, examples.Unauthorized.StatusErr().Is(examples.Unauthorized))
-	require.True(t, examples.Unauthorized.StatusErr().Is(examples.Unauthorized.StatusErr()))
+	require.True(t, errors.Is(examples.Unauthorized.StatusErr(), examples.Unauthorized))
+	require.True(t, errors.Is(examples.Unauthorized.StatusErr(), examples.Unauthorized.StatusErr()))
 }
 
 func TestStatusErrBuilders(t *testing.T) {

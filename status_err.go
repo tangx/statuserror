@@ -94,7 +94,11 @@ func (statusErr *StatusErr) Summary() string {
 }
 
 func (statusErr *StatusErr) Is(err error) bool {
-	return FromErr(err).Code == statusErr.Code
+	e := FromErr(err)
+	if statusErr == nil || e == nil {
+		return false
+	}
+	return e.Code == statusErr.Code
 }
 
 func StatusCodeFromCode(code int) int {
