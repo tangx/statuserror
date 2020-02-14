@@ -1,7 +1,6 @@
 package statuserror
 
 type StatusError interface {
-	Unwrap() error
 	StatusErr() *StatusErr
 	Error() string
 }

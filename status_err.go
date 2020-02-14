@@ -2,7 +2,6 @@ package statuserror
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -16,8 +15,8 @@ func IsStatusErr(err error) (*StatusErr, bool) {
 		return nil, false
 	}
 
-	if e := errors.Unwrap(err); e != nil {
-		err = e
+	if statusError, ok := err.(StatusError); ok {
+		return statusError.StatusErr(), ok
 	}
 
 	statusErr, ok := err.(*StatusErr)
