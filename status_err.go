@@ -2,6 +2,7 @@ package statuserror
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -10,19 +11,26 @@ import (
 	"strings"
 )
 
+func IsStatusErr(err error) (*StatusErr, bool) {
+	if err == nil {
+		return nil, false
+	}
+
+	if e := errors.Unwrap(err); e != nil {
+		err = e
+	}
+
+	statusErr, ok := err.(*StatusErr)
+	return statusErr, ok
+}
+
 func FromErr(err error) *StatusErr {
 	if err == nil {
 		return nil
 	}
-
-	if statusErrCode, ok := err.(StatusError); ok {
-		return statusErrCode.StatusErr()
-	}
-
-	if statusErr, ok := err.(*StatusErr); ok {
+	if statusErr, ok := IsStatusErr(err); ok {
 		return statusErr
 	}
-
 	return NewUnknownErr().WithDesc(err.Error())
 }
 
@@ -98,7 +106,7 @@ func (statusErr *StatusErr) Is(err error) bool {
 	if statusErr == nil || e == nil {
 		return false
 	}
-	return e.Code == statusErr.Code
+	return e.Key == statusErr.Key && e.Code == statusErr.Code
 }
 
 func StatusCodeFromCode(code int) int {

@@ -1,11 +1,7 @@
 package statuserror
 
 type StatusError interface {
-	Key() string
-	Code() int
-	Msg() string
-	CanBeTalkError() bool
-	StatusCode() int
+	Unwrap() error
 	StatusErr() *StatusErr
 	Error() string
 }

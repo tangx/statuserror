@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/go-courier/statuserror/__examples__"
+	. "github.com/onsi/gomega"
 
 	"github.com/go-courier/statuserror"
-	"github.com/go-courier/statuserror/__examples__"
 )
 
 func ExampleStatusErr() {
@@ -25,21 +25,20 @@ func ExampleStatusErr() {
 func TestStatusErr(t *testing.T) {
 	summary := statuserror.NewUnknownErr().Summary()
 
-	require.Equal(t, "@StatusErr[UnknownError][500000000][unknown error]", summary)
+	NewWithT(t).Expect(summary).To(Equal("@StatusErr[UnknownError][500000000][unknown error]"))
 
 	statusErr, err := statuserror.ParseStatusErrSummary(summary)
-	require.NoError(t, err)
+	NewWithT(t).Expect(err).To(BeNil())
 
-	require.Equal(t, statuserror.NewUnknownErr(), statusErr)
+	NewWithT(t).Expect(statusErr).To(Equal(statuserror.NewUnknownErr()))
+	NewWithT(t).Expect(examples.Unauthorized.StatusErr().Summary()).To(Equal("@StatusErr[Unauthorized][401999001][Unauthorized]!"))
+	NewWithT(t).Expect(examples.InternalServerError.StatusErr().Summary()).To(Equal("@StatusErr[InternalServerError][500999001][InternalServerError]"))
+	NewWithT(t).Expect(examples.Unauthorized.StatusCode()).To(Equal(401))
+	NewWithT(t).Expect(examples.Unauthorized.StatusErr().StatusCode()).To(Equal(401))
 
-	require.Equal(t, "@StatusErr[Unauthorized][401999001][Unauthorized]!", examples.Unauthorized.StatusErr().Summary())
-	require.Equal(t, "@StatusErr[InternalServerError][500999001][InternalServerError]", examples.InternalServerError.StatusErr().Summary())
-
-	require.Equal(t, 401, examples.Unauthorized.StatusCode())
-	require.Equal(t, 401, examples.Unauthorized.StatusErr().StatusCode())
-
-	require.True(t, errors.Is(examples.Unauthorized.StatusErr(), examples.Unauthorized))
-	require.True(t, errors.Is(examples.Unauthorized.StatusErr(), examples.Unauthorized.StatusErr()))
+	NewWithT(t).Expect(errors.Is(examples.Unauthorized, examples.Unauthorized)).To(BeTrue())
+	NewWithT(t).Expect(errors.Is(examples.Unauthorized.StatusErr(), examples.Unauthorized)).To(BeTrue())
+	NewWithT(t).Expect(errors.Is(examples.Unauthorized.StatusErr(), examples.Unauthorized.StatusErr())).To(BeTrue())
 }
 
 func TestStatusErrBuilders(t *testing.T) {

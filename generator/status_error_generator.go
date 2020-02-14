@@ -113,6 +113,14 @@ CanBeTalkError: v.CanBeTalkError(),
 	file.WriteBlock(
 		codegen.Func().
 			MethodOf(codegen.Var(codegen.Type(s.Name()), "v")).
+			Named("Unwrap").
+			Return(codegen.Var(codegen.Error)).Do(
+			file.Expr(`return v.StatusErr()`)),
+	)
+
+	file.WriteBlock(
+		codegen.Func().
+			MethodOf(codegen.Var(codegen.Type(s.Name()), "v")).
 			Named("Error").
 			Return(codegen.Var(codegen.String)).Do(
 			file.Expr(`return v.StatusErr().Error()`)),
