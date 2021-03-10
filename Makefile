@@ -1,4 +1,12 @@
-test:
+test: download
 	go test -v -race ./...
+
 cover:
 	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+download:
+	go mod download
+
+dep:
+	go get -u ./...
+	go get -u -t ./...

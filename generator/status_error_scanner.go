@@ -103,7 +103,7 @@ func (scanner *StatusErrorScanner) addStatusError(
 		scanner.StatusErrors = map[*types.TypeName][]*statuserror.StatusErr{}
 	}
 
-	statusErr := statuserror.NewStatusErr(key, code, msg)
+	statusErr := &statuserror.StatusErr{Key:key, Code:code, Msg:msg}
 	if canBeTalkError {
 		statusErr = statusErr.EnableErrTalk()
 	}

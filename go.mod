@@ -1,12 +1,16 @@
 module github.com/go-courier/statuserror
 
-go 1.13
+go 1.16
 
 require (
-	github.com/davecgh/go-spew v1.1.1
 	github.com/go-courier/codegen v1.1.2
-	github.com/go-courier/packagesx v1.0.1
-	github.com/go-courier/reflectx v1.3.3
-	github.com/onsi/gomega v1.9.0
-	golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e
+	github.com/go-courier/packagesx v1.0.2
+	github.com/go-courier/reflectx v1.3.4
+	github.com/onsi/gomega v1.11.0
+	github.com/pkg/errors v0.9.1 // indirect
+	golang.org/x/mod v0.4.1 // indirect
+	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
+	golang.org/x/sys v0.0.0-20210309074719-68d13333faf2 // indirect
+	golang.org/x/text v0.3.5 // indirect
+	golang.org/x/tools v0.1.0
 )

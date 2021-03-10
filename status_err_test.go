@@ -1,13 +1,13 @@
 package statuserror_test
 
 import (
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
+	"net/http"
 	"testing"
 
 	"github.com/go-courier/statuserror/__examples__"
 	. "github.com/onsi/gomega"
-
 	"github.com/go-courier/statuserror"
 )
 
@@ -23,14 +23,19 @@ func ExampleStatusErr() {
 }
 
 func TestStatusErr(t *testing.T) {
-	summary := statuserror.NewUnknownErr().Summary()
+	unknownErr := statuserror.Wrap(errors.New(""), http.StatusInternalServerError, "UnknownError")
 
-	NewWithT(t).Expect(summary).To(Equal("@StatusErr[UnknownError][500000000][unknown error]"))
+	t.Logf("%+v", unknownErr)
+
+	summary := unknownErr.Summary()
+
+	NewWithT(t).Expect(summary).To(Equal("@StatusErr[UnknownError][500000000][UnknownError]"))
 
 	statusErr, err := statuserror.ParseStatusErrSummary(summary)
 	NewWithT(t).Expect(err).To(BeNil())
 
-	NewWithT(t).Expect(statusErr).To(Equal(statuserror.NewUnknownErr()))
+	NewWithT(t).Expect(statusErr.Summary()).To(Equal(unknownErr.Summary()))
+
 	NewWithT(t).Expect(examples.Unauthorized.StatusErr().Summary()).To(Equal("@StatusErr[Unauthorized][401999001][Unauthorized]!"))
 	NewWithT(t).Expect(examples.InternalServerError.StatusErr().Summary()).To(Equal("@StatusErr[InternalServerError][500999001][InternalServerError]"))
 	NewWithT(t).Expect(examples.Unauthorized.StatusCode()).To(Equal(401))

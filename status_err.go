@@ -1,11 +1,10 @@
 package statuserror
 
 import (
-	"bytes"
 	"fmt"
+	"github.com/pkg/errors"
+	"io"
 	"net/http"
-	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -30,25 +29,47 @@ func FromErr(err error) *StatusErr {
 	if statusErr, ok := IsStatusErr(err); ok {
 		return statusErr
 	}
-	return NewUnknownErr().WithDesc(err.Error())
+	return Wrap(err, http.StatusInternalServerError, "UnknownError", "unknown error")
 }
 
-func NewUnknownErr() *StatusErr {
-	return NewStatusErr("UnknownError", http.StatusInternalServerError*1e6, "unknown error")
-}
-
-func NewStatusErr(key string, code int, msg string) *StatusErr {
-	return &StatusErr{
-		Key:  key,
-		Code: code,
-		Msg:  msg,
+func Wrap(err error, code int, key string, msgAndDesc ...string) *StatusErr {
+	if err == nil {
+		return nil
 	}
+
+	if len(strconv.Itoa(code)) == 3 {
+		code = code * 1e6
+	}
+
+	msg := key
+
+	if len(msgAndDesc) > 0 {
+		msg = msgAndDesc[0]
+	}
+
+	desc := ""
+
+	if len(msgAndDesc) > 1 {
+		desc = strings.Join(msgAndDesc[1:], "\n")
+	} else {
+		desc = err.Error()
+	}
+
+	s := &StatusErr{
+		Key:   key,
+		Code:  code,
+		Msg:   msg,
+		Desc:  desc,
+		error: errors.WithStack(err),
+	}
+
+	return s
 }
 
 type StatusErr struct {
 	// key of err
 	Key string `json:"key" xml:"key"`
-	// unique err code
+	// http code
 	Code int `json:"code" xml:"code"`
 	// msg of err
 	Msg string `json:"msg" xml:"msg"`
@@ -64,27 +85,38 @@ type StatusErr struct {
 	Sources []string `json:"sources" xml:"sources"`
 	// error in where fields
 	ErrorFields ErrorFields `json:"errorFields" xml:"errorFields"`
+
+	error error
 }
 
-func ParseStatusErrSummary(s string) (*StatusErr, error) {
-	if !reStatusErrSummary.Match([]byte(s)) {
-		return nil, fmt.Errorf("unsupported status err summary: %s", s)
+func (statusErr *StatusErr) Format(s fmt.State, verb rune) {
+	switch verb {
+	case 'v':
+		if s.Flag('+') {
+			e := statusErr.Unwrap()
+			if w, ok := e.(WithStackTrace); ok {
+				stackTrace := w.StackTrace()
+				if len(stackTrace) > 1 {
+					_, _ = fmt.Fprintf(s, "%+v", stackTrace[1:])
+				}
+			}
+			return
+		}
+		fallthrough
+	case 's':
+		_, _ = io.WriteString(s, statusErr.Error())
+	case 'q':
+		_, _ = fmt.Fprintf(s, "%q", statusErr.Error())
 	}
-
-	matched := reStatusErrSummary.FindStringSubmatch(s)
-
-	code, _ := strconv.ParseInt(matched[2], 10, 64)
-
-	return &StatusErr{
-		Key:            matched[1],
-		Code:           int(code),
-		Msg:            matched[3],
-		CanBeTalkError: matched[4] != "",
-	}, nil
 }
 
-// @err[UnknownError][500000000][unknown error]
-var reStatusErrSummary = regexp.MustCompile(`@StatusErr\[(.+)\]\[(.+)\]\[(.+)\](!)?`)
+type WithStackTrace interface {
+	StackTrace() errors.StackTrace
+}
+
+func (statusErr *StatusErr) Unwrap() error {
+	return statusErr.error
+}
 
 func (statusErr *StatusErr) Summary() string {
 	s := fmt.Sprintf(
@@ -177,60 +209,4 @@ func (statusErr StatusErr) AppendErrorField(in string, field string, msg string)
 func (statusErr StatusErr) AppendErrorFields(errorFields ...*ErrorField) *StatusErr {
 	statusErr.ErrorFields = append(statusErr.ErrorFields, errorFields...)
 	return &statusErr
-}
-
-func NewErrorField(in string, field string, msg string) *ErrorField {
-	return &ErrorField{
-		In:    in,
-		Field: field,
-		Msg:   msg,
-	}
-}
-
-type ErrorField struct {
-	// field path
-	// prop.slice[2].a
-	Field string `json:"field" xml:"field"`
-	// msg
-	Msg string `json:"msg" xml:"msg"`
-	// location
-	// eq. body, query, header, path, formData
-	In string `json:"in" xml:"in"`
-}
-
-func (s ErrorField) String() string {
-	return s.Field + " in " + s.In + " - " + s.Msg
-}
-
-type ErrorFields []*ErrorField
-
-func (fields ErrorFields) String() string {
-	if len(fields) == 0 {
-		return ""
-	}
-
-	sort.Sort(fields)
-
-	buf := &bytes.Buffer{}
-	buf.WriteString("<")
-	for i, f := range fields {
-		if i > 0 {
-			buf.WriteString(", ")
-		}
-		buf.WriteString(f.String())
-	}
-	buf.WriteString(">")
-	return buf.String()
-}
-
-func (fields ErrorFields) Len() int {
-	return len(fields)
-}
-
-func (fields ErrorFields) Swap(i, j int) {
-	fields[i], fields[j] = fields[j], fields[i]
-}
-
-func (fields ErrorFields) Less(i, j int) bool {
-	return fields[i].Field < fields[j].Field
 }
