@@ -2,13 +2,14 @@ package statuserror_test
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"net/http"
 	"testing"
 
-	"github.com/go-courier/statuserror/__examples__"
-	. "github.com/onsi/gomega"
+	"github.com/pkg/errors"
+
 	"github.com/go-courier/statuserror"
+	examples "github.com/go-courier/statuserror/__examples__"
+	. "github.com/onsi/gomega"
 )
 
 func ExampleStatusErr() {

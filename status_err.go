@@ -2,11 +2,12 @@ package statuserror
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func IsStatusErr(err error) (*StatusErr, bool) {
@@ -55,6 +56,8 @@ func Wrap(err error, code int, key string, msgAndDesc ...string) *StatusErr {
 		desc = err.Error()
 	}
 
+	// err = errors.WithMessage(err, "asdfasdfasdfasdfass")
+
 	s := &StatusErr{
 		Key:   key,
 		Code:  code,
@@ -97,7 +100,7 @@ func (statusErr *StatusErr) Format(s fmt.State, verb rune) {
 			if w, ok := e.(WithStackTrace); ok {
 				stackTrace := w.StackTrace()
 				if len(stackTrace) > 1 {
-					_, _ = fmt.Fprintf(s, "%+v", stackTrace[1:])
+					_, _ = fmt.Fprintf(s, statusErr.Error()+"%+v", stackTrace[1:])
 				}
 			}
 			return
